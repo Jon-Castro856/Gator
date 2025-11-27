@@ -6,6 +6,8 @@ import (
 
 func main() {
 	jsonConfig := config.Read()
-	jsonConfig.SetUser("Jon")
-	jsonConfig = config.Read()
+	state := config.State{
+		Config: &jsonConfig,
+	}
+
 }
