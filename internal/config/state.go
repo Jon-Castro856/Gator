@@ -10,13 +10,13 @@ type Command struct {
 }
 
 type Commands struct {
-	cmd map[string]func(*State, Command) error
+	Cmd map[string]func(*State, Command) error
 }
 
-func (c *Commands) run(s *State, cmd Command) error {
+func (c *Commands) Run(s *State, cmd Command) error {
 
 }
 
 func (c *Commands) register(name string, f func(*State, Command) error) {
-
+	return
 }
