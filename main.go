@@ -2,32 +2,36 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/Jon-Castro856/Gator/internal/config"
 )
 
 func main() {
-	jsonConfig := config.Read()
-	state := config.State{
+	jsonConfig, err := config.Read()
+	if err != nil {
+		log.Fatalf("error reading config: %v", err)
+	}
+
+	programState := &config.State{
 		Config: &jsonConfig,
 	}
-	commandArgs := config.Command{
-		Name: os.Args[1],
-		Args: os.Args[2:],
+
+	cmds := config.Commands{
+		RegisteredCommands: make(map[string]func(*config.State, config.Command) error),
 	}
-	cmds := config.Commands{}
+	cmds.Register("login", handlerLogin)
 
-	cmds.Cmd["login"] = handlerLogin
-
-	if os.Args < 2 {
+	if len(os.Args) < 2 {
 		fmt.Println("not enough arguments")
 		os.Exit(1)
 	}
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
 
-	action := commandArgs.Name
-
-	cmds.Run(cmds.Cmd[action](&state, commandArgs))
-
-	return
+	err = cmds.Run(programState, config.Command{Name: cmdName, Args: cmdArgs})
+	if err != nil {
+		log.Fatal(err)
+	}
 }

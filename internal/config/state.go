@@ -1,5 +1,7 @@
 package config
 
+import "errors"
+
 type State struct {
 	Config *Config
 }
@@ -10,13 +12,17 @@ type Command struct {
 }
 
 type Commands struct {
-	Cmd map[string]func(*State, Command) error
+	RegisteredCommands map[string]func(*State, Command) error
 }
 
 func (c *Commands) Run(s *State, cmd Command) error {
-
+	f, ok := c.RegisteredCommands[cmd.Name]
+	if !ok {
+		return errors.New("command not found")
+	}
+	return f(s, cmd)
 }
 
-func (c *Commands) register(name string, f func(*State, Command) error) {
-	return
+func (c *Commands) Register(name string, f func(*State, Command) error) {
+	c.RegisteredCommands[name] = f
 }

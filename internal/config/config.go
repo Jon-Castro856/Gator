@@ -13,19 +13,19 @@ type Config struct {
 	Username string `json:"current_user_name,omitempty"`
 }
 
-func Read() Config {
+func Read() (Config, error) {
 	config := Config{}
 
 	configPath, err := getConfigFilePath()
 	if err != nil {
 		fmt.Println("error getting home directory:", err)
-		return Config{}
+		return Config{}, err
 	}
 
 	configFile, err := os.Open(configPath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
-		return Config{}
+		return Config{}, err
 	}
 	defer configFile.Close()
 
@@ -33,10 +33,9 @@ func Read() Config {
 	err = decoder.Decode(&config)
 	if err != nil {
 		fmt.Println("Error decoding Json:", err)
-		return Config{}
+		return Config{}, err
 	}
-	fmt.Println(config)
-	return config
+	return config, nil
 }
 
 func (c Config) SetUser(name string) {
