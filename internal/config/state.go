@@ -1,9 +1,14 @@
 package config
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/Jon-Castro856/Gator/internal/database"
+)
 
 type State struct {
 	Config *Config
+	DB     *database.Queries
 }
 
 type Command struct {
