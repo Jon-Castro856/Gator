@@ -11,3 +11,10 @@ RETURNING *;
 -- name: GetUser :one
 SELECT * FROM users
 WHERE user_name = $1;
+
+
+-- name: ResetTable :exec
+DELETE FROM users;
+
+-- name: GetUsers :many
+SELECT user_name FROM users;
