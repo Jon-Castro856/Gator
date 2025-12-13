@@ -7,4 +7,5 @@ func initCliCmds(cmd config.Commands) {
 	cmd.Register("register", handlerRegister)
 	cmd.Register("reset", handlerReset)
 	cmd.Register("users", handlerGetUsers)
+	cmd.Register("agg", handlerAgg)
 }
