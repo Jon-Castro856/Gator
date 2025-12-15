@@ -13,7 +13,7 @@ func handlerFeeds(s *config.State, c config.Command) error {
 
 	feeds, err := s.DB.GetFeeds(ctx)
 	if err != nil {
-		fmt.Println("error retreiving feeds: %v\n", err)
+		fmt.Printf("error retreiving feeds: %v\n", err)
 		os.Exit(1)
 	}
 
