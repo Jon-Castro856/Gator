@@ -11,4 +11,5 @@ func initCliCmds(cmd config.Commands) {
 	cmd.Register("addfeed", handlerAddFeed)
 	cmd.Register("feeds", handlerFeeds)
 	cmd.Register("follow", handlerFollow)
+	cmd.Register("following", handlerFollowing)
 }
