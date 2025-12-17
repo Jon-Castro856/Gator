@@ -26,3 +26,7 @@ WHERE user_name = $1;
 -- name: GetUserName :one
 SELECT user_name FROM users
 WHERE id = $1;
+
+-- name: GetUserInfo :one
+SELECT * FROM users
+WHERE user_name = $1;
