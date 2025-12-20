@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/Jon-Castro856/Gator/internal/config"
@@ -11,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAddFeed(s *config.State, c config.Command) error {
+func handlerAddFeed(s *config.State, c config.Command, user database.User) error {
 	args := c.Args
 	ctx := context.Background()
 
@@ -21,33 +20,28 @@ func handlerAddFeed(s *config.State, c config.Command) error {
 	name := args[0]
 	feedURL := args[1]
 
-	id, err := s.DB.GetUserID(context.Background(), s.Config.Username)
-	if err != nil {
-		fmt.Printf("error getting user name: %v\n", err)
-		os.Exit(1)
-	}
-
 	feed, err := s.DB.CreateFeed(ctx, database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		FeedName:  name,
 		Url:       feedURL,
-		UserID:    id,
+		UserID:    user.ID,
 	})
 
 	if err != nil {
-		fmt.Printf("error creating feed: %v\n", err)
+		return err
 	}
 
 	_, err = s.DB.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
 		ID:     uuid.New(),
-		UserID: id,
+		UserID: user.ID,
 		FeedID: feed.ID,
 	})
 	if err != nil {
-		fmt.Printf("error creating feed follow entry: %v\n", err)
+		return err
 	}
+
 	fmt.Println("succesfully created feed")
 	fmt.Println(feed)
 	return nil

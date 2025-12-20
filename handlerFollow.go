@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerFollow(s *config.State, c config.Command) error {
+func handlerFollow(s *config.State, c config.Command, user database.User) error {
 	args := c.Args
 	ctx := context.Background()
 
@@ -20,13 +20,6 @@ func handlerFollow(s *config.State, c config.Command) error {
 	}
 	url := args[0]
 
-	userName := s.Config.Username
-	userId, err := s.DB.GetUserID(ctx, userName)
-	if err != nil {
-		fmt.Printf("error retreiving user name: %v\n", err)
-		os.Exit(1)
-	}
-
 	feedInfo, err := s.DB.GetFeedNameAndID(ctx, url)
 	if err != nil {
 		fmt.Printf("error retreiving feed name: %v\n", err)
@@ -34,7 +27,7 @@ func handlerFollow(s *config.State, c config.Command) error {
 
 	feedFollow, err := s.DB.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
 		ID:     uuid.New(),
-		UserID: userId,
+		UserID: user.ID,
 		FeedID: feedInfo.ID,
 	})
 	if err != nil {
