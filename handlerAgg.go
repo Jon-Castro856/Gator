@@ -10,15 +10,55 @@ import (
 )
 
 func handlerAgg(s *config.State, c config.Command) error {
-	url := "https://www.wagslane.dev/index.xml"
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	feed, err := fetchFeed(ctx, url)
-	if err != nil {
-		fmt.Printf("error retreiving RSS feed: %v", err)
+	args := c.Args
+	if len(args) != 2 {
+		fmt.Println("incorrect arguments")
 		os.Exit(1)
 	}
-	fmt.Println(feed)
+
+	if args[0] != "tbr" {
+		fmt.Println("use 'tbr' to indicate time between requests")
+		os.Exit(1)
+	}
+
+	timer, err := time.ParseDuration(args[1])
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Now scraping feeds every %v\n", timer)
+	ticker := time.NewTicker(timer)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
+}
+
+func scrapeFeeds(s *config.State) error {
+	ctx := context.Background()
+	nextFeed, err := s.DB.GetNextFeedToFetch(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = s.DB.MarkFeedFetched(ctx, nextFeed.ID)
+	if err != nil {
+		return err
+	}
+
+	webCTX, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	fetched, err := fetchFeed(webCTX, nextFeed.Url)
+	if err != nil {
+		return err
+	}
+
+	for _, feed := range fetched.Channel.Item {
+		err := createPost(s, feed, nextFeed.ID)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

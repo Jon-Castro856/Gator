@@ -13,4 +13,5 @@ func initCliCmds(cmd config.Commands) {
 	cmd.Register("follow", middlewareLoggedIn(handlerFollow))
 	cmd.Register("following", middlewareLoggedIn(handlerFollowing))
 	cmd.Register("unfollow", middlewareLoggedIn(handlerUnFollow))
+	cmd.Register("browse", handlerBrowse)
 }
